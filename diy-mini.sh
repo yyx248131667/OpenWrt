@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # 修改默认IP
-# sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
 
 # 更改默认 Shell 为 zsh
-# sed -i 's/\/bin\/ash/\/usr\/bin\/zsh/g' package/base-files/files/etc/passwd
+sed -i 's/\/bin\/ash/\/usr\/bin\/zsh/g' package/base-files/files/etc/passwd
 
 # TTYD 免登录
 # sed -i 's|/bin/login|/bin/login -f root|g' feeds/packages/utils/ttyd/files/ttyd.config
@@ -115,3 +115,20 @@ sed -i 's|admin\\|admin\\/services\\|g' feeds/luci/applications/luci-app-dockerm
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
+
+# 整理固件包时候,删除您不想要的固件或者文件,让它不需要上传到Actions空间(根据编译机型变化,自行调整删除名称)
+cat >"$CLEAR_PATH" <<-EOF
+packages
+config.buildinfo
+feeds.buildinfo
+sha256sums
+version.buildinfo
+profiles.json
+openwrt-x86-64-generic-kernel.bin
+openwrt-x86-64-generic.manifest
+openwrt-x86-64-generic-squashfs-rootfs.img.gz
+EOF
+
+# 在线更新时，删除不想保留固件的某个文件，在EOF跟EOF之间加入删除代码，记住这里对应的是固件的文件路径，比如： rm -rf /etc/config/luci
+cat >>$DELETE <<-EOF
+EOF
